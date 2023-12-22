@@ -1,5 +1,8 @@
+// Constants for concat types
 const h="hconcat"
 const v="vconcat"
+
+// Data for concatenation view
 let concat_view=[
   [1,2],
   [2,3],
@@ -12,6 +15,7 @@ let concat_view=[
   [9,10]
 ]
 
+// Visualizations
 const v0={
   width:350,
   height:300,
@@ -109,41 +113,14 @@ let visualisation=[
   v0,v1,v2,v3,v4,v5,v6,v7,v8,v9
 ]
 
-
+// Arrays for template generation
 let tableauC=[]
 let list_template1=[""]
 let list_template2=[""]
 let tableauV=[]
 let templateTotal=[]
-/*
-let element=[3,4]
 
-create_template_concat(tableauC,list_template1,element[0],h)
-create_template_concat(tableauC,list_template2,element[0],v)
-//templateTotal=tableauC
-let listV=[]
-for(let i=0;i<element[1];i++)
-{
-  let statue=1;
-  while(1)
-  {
-    let choix=Math.floor(Math.random()*10)
-    if(!listV.includes(choix))
-    {
-      listV.push(choix)   
-      break; 
-    }
-  }
-}
-console.log(listV)
-create_template_view(tableauV,listV,0,element[1])
-
-
-console.log(tableauC)
-console.log(tableauV)
-melange_concat_view(templateTotal,tableauC,tableauV)
-console.log(templateTotal)
-*/
+// Function to create a new tableau by concatenating part concat and part visualisation
 function melange_concat_view(templateTotal,tableauC,tableauV)
 {
   tableauC.forEach(elementC => {
@@ -153,18 +130,8 @@ function melange_concat_view(templateTotal,tableauC,tableauV)
     });
   });
 }
-/*
-let first=templateTotal[1]
-console.log(first)
-let template=[...first]
-console.log(template)
-for(let i=element[0]; i<element[0]+element[1];i++)
-{
-  template[i]=visualisation[first[i]]
-}
-console.log(template)
-*/
 
+// Function to create concatenation part for a template
 function create_template_concat(tableau,list, nbConcat,typeConcat)
 {
   if(nbConcat==1)
@@ -181,7 +148,7 @@ function create_template_concat(tableau,list, nbConcat,typeConcat)
   }
 }
 
-//perm
+// Function to create visualisation part for a template
 function create_template_view(tableau,list,cursor,nbView)
 {
   if(cursor==nbView)
@@ -200,13 +167,14 @@ function create_template_view(tableau,list,cursor,nbView)
   }
 }
 
+// Function to exchange two element in an array
 function swapElements(array, index1, index2){
   let temp = array[index1];
   array[index1] = array[index2];
   array[index2] = temp;
 }
 
-
+//function to update vega-lite objet using template choosen
 function create_vega_tree(concatList,template,vlSpec,cursor)
   {      
     if(cursor<template.length)
@@ -256,6 +224,7 @@ function create_vega_tree(concatList,template,vlSpec,cursor)
     }        
   }
 
+  // Vega-Lite specification
 let vlSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: {
@@ -263,22 +232,24 @@ let vlSpec = {
     }
 }
 
-
+// Event listeners for form submission and interaction
 let visConfig=document.getElementById("visConf")
 let affichage=document.getElementById("affichage")
 let concatOp=document.getElementById("concatOp")
 visConfig.addEventListener('submit',(event)=>
   {
+    //get user submission
     event.preventDefault()
     let nbView = document.getElementById("nbView").value
     let nbLayout=document.getElementById("nbLayout").value
     console.log(nbView)
     console.log(nbLayout)
 
+    //create template
     let element=[nbView-1,nbView]
     create_template_concat(tableauC,list_template1,element[0],h)
     create_template_concat(tableauC,list_template2,element[0],v)
-//templateTotal=tableauC
+
     let listV=[]
     for(let i=0;i<element[1];i++)
     {
@@ -293,12 +264,9 @@ visConfig.addEventListener('submit',(event)=>
         }
       }
     }
-   // console.log(listV)
+   
     create_template_view(tableauV,listV,0,element[1])
 
-
-    //console.log(tableauC)
-    //console.log(tableauV)
     melange_concat_view(templateTotal,tableauC,tableauV)
     console.log(templateTotal)
     let layoutList=[]
@@ -317,14 +285,6 @@ visConfig.addEventListener('submit',(event)=>
     console.log(layoutList)
     console.log(template)
 
-    //let selectBar=document.getElementById("concatChoix")
-
-   /* let newTitle=document.createElement("h2")
-    newTitle.textContent="les templates:"
-    affichage.appendChild(newTitle)
-    let newTem=document.createElement("select")
-    newTem.id="concatChoix"
-    */
 
    for(let i=0;i<layoutList.length;i++)
    {
@@ -333,24 +293,9 @@ visConfig.addEventListener('submit',(event)=>
       newOp.textContent=template[i].slice(0,nbView-1)
       concatOp.appendChild(newOp)
    }
-
-/*for(let i=element[0]; i<element[0]+element[1];i++)
-{
-  template[i]=visualisation[first[i]]
-}
-console.log(template)
-*/
-   // console.log(templateTotal)
-
-   /* let concatList=[]
-    create_vega_tree(concatList,template,vlSpec,0)
-    console.log(vlSpec)
-
-      // Embed the visualization in the container with id `vis`
-    vegaEmbed('#vis', vlSpec);
-    */
   })
 
+// Event listeners for refresh the page
 let refreshButton=document.getElementById("refresh")
 refreshButton.addEventListener("click",(event)=>
 {
