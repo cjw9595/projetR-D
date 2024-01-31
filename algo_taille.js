@@ -347,7 +347,7 @@ function calcul_taille_v2(template,index,size)
       size.width_right = size.width
       size.height_right = size.height
     }
-    size.width_total=size.width_left+size.width_right
+    size.width_total +=(size.width_left+size.width_right)
     size.height_total=which_is_max(size.height_left,size.height_right)
   }
   else if(template[index]=="vconcat")
