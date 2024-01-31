@@ -315,7 +315,7 @@ function calcul_taille_v2(template,index,size)
       size.width_right += size.width
     }*/
     //2 sons are views
-    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+   /* if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
       size.width_left = size.height
       size.height_left = size.height
     }
@@ -330,9 +330,9 @@ function calcul_taille_v2(template,index,size)
     {
       size.width_left = size.width_total
       size.height_left = size.height_total
-    }
+    }*/
     calcul_taille_v2(template, 2 * index + 2, size)
-    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+   /* if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
       size.width_right = size.width
       size.height_right = size.height
     }
@@ -348,12 +348,14 @@ function calcul_taille_v2(template,index,size)
       size.height_right = size.height
     }
     size.width_total +=(size.width_left+size.width_right)
-    size.height_total=which_is_max(size.height_left,size.height_right)
+    size.height_total=which_is_max(size.height_left,size.height_right) */
+    size.height_total+=which_is_max(height,size.height)
+    size.width_total+=width
   }
   else if(template[index]=="vconcat")
   {
     calcul_taille_v2(template, 2 * index + 1, size)
-    //2 sons are views
+  /*  //2 sons are views
     if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
       size.width_left = size.height
       size.height_left = size.height
@@ -369,9 +371,9 @@ function calcul_taille_v2(template,index,size)
     {
       size.width_left = size.width_total
       size.height_left = size.height_total
-    }
+    }*/
     calcul_taille_v2(template, 2 * index + 2, size)
-    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+   /* if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
       size.width_right = size.width
       size.height_right = size.height
     }
@@ -389,35 +391,37 @@ function calcul_taille_v2(template,index,size)
     //for width
     size.width_total=which_is_max(size.width_left,size.width_right)
     //for height
-    size.height_total=size.height_left+size.height_right
+    size.height_total=size.height_left+size.height_right*/
+    size.width_total+=which_is_max(width,size.width_total)
+    size.height_total+=height
   }
   else
   {
     if(template[index].hasOwnProperty("width"))
     {
         //!!!!!now we just talk about the case that width is a number!!!!!!
-        size.width=template[index].width
+        width=template[index].width
     }
     else //objet don't set this attribut, need to do other check
     {
       //!!!!!!now we just use 200 to have a try
-      size.width=200
+      width=200
     }
 
     if(template[index].hasOwnProperty("height"))
     {
       //!!!!!now we just talk about the case that width is a number!!!!!!
-      size.height=template[index].height
+      height=template[index].height
     }
     else //objet don't set this attribut, need to do other check
     {
       //!!!!!!now we just use 200 to have a try
-      size.height=200
+      height=200
     }
   }
 
 }
-calcul_taille_v2(template,0,size)
+calcul_taille_v2(template,0,size,size.width,size.height)
 console.log("width="+ size.width_total)
 console.log("height="+ size.height_total)
 
