@@ -153,8 +153,7 @@ function calcul_taille(template,index,size,Concat)
   }
   else  //all other index should check "Concat"--his father concat
   {
-    //save father concat
-    concat_pere=Concat
+    let concat_pere=Concat
     if(template[index]=="hconcat")
   {
     //calcul his sons first, update Concat
@@ -162,8 +161,7 @@ function calcul_taille(template,index,size,Concat)
     width1=size.width
     height1=size.height
     calcul_taille(template,2*index+2,size,"h")
-    width2=size.width
-    height2=size.height
+
 
     //when arrive here, we should already have width and height for sub-tree
     if(concat_pere=="h")
@@ -194,6 +192,24 @@ function calcul_taille(template,index,size,Concat)
    calcul_taille(template,2*index+2,size,"v")
    width2=size.width
    height2=size.height
+   if(concat_pere=="h")
+    {
+      //for width
+      size.width=width1+width2
+      
+      //for height
+      size.height=which_is_max(height1,height2)
+    }
+    else if (concat_pere=="v")
+    {
+      //for width
+      size.width=which_is_max(width1,width2)
+    
+      //for height
+      size.height=height1+height2
+    }
+
+
   }
   else  //template[i] is a vega-graphe objet
   {
@@ -228,7 +244,8 @@ function calcul_taille(template,index,size,Concat)
     {
       if(Concat=="h")
       {
-        size.height=which_is_max(size.height, template[index].height)
+       // size.height=which_is_max(size.height, template[index].height)
+        size.height=template[index].height
       }
       else if(Concat=="v")
       {
@@ -240,7 +257,8 @@ function calcul_taille(template,index,size,Concat)
      // let typeY=template[index].encoding.y.type
      if(Concat=="h")
       {
-        size.height=which_is_max(size.height, 200)
+        //size.height=which_is_max(size.height, 200)
+        size.height=template[index].height
       }
       else if(Concat=="v")
       {
@@ -250,31 +268,158 @@ function calcul_taille(template,index,size,Concat)
       
   }
 
-  //calcul width and height according to Concat
-  if(concat_pere=="h")
-    {
-      //for width
-      size.width=width1+width2
-      
-      //for height
-      size.height=which_is_max(height1,height2)
-    }
-    else if (concat_pere=="v")
-    {
-      //for width
-      size.width=which_is_max(width1,width2)
-    
-      //for height
-      size.height=height1+height2
-    }
-
-
   }
   
 }
 
-calcul_taille(template,0,size,"c")
-console.log("width"+ size.width)
-console.log("height"+ size.height)
+let width=0
+let height=0
+function calcul_taille_v2(template,index,size)
+{
+ // let width1=0,width2=0,height1=0,height2=0
+  //function stop
+  if(index>=template.length)
+    return 0
+  if(template[index]=="hconcat")
+  {
+    /*
+    calcul_taille_v2(template,2*index+1,size)
+    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat") {
+     // size.width_left = size.width
+     // size.height_left = size.height
+      size.height_left = which_is_max(size.height, size.height_left)
+      size.width_left += size.width
+    }
+
+    calcul_taille_v2(template, 2 * index + 2, size)
+    if(template[2*index+1]!="hconcat" && template[2*index+2]!="vconcat") {
+     // size.width_right = size.width
+     // size.height_right = size.height
+      size.height_right = which_is_max(size.height, size.height_right)
+      size.width_right += size.width
+    }*/
+
+    calcul_taille_v2(template,2*index+1,size)
+    //2 son are view
+  /*  if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat")
+    {
+      size.height_left = which_is_max(size.height, size.height_left)
+      size.width_left += size.width
+    }
+
+
+    calcul_taille_v2(template, 2 * index + 2, size)
+    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat")
+    {
+      size.height_right = which_is_max(size.height, size.height_right)
+      size.width_right += size.width
+    }*/
+    //2 sons are views
+    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+      size.width_left = size.height
+      size.height_left = size.height
+    }
+    //2 sons are concat
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]=="hconcat" || template[2*index+2]=="vconcat") )
+    {
+      size.width_left = size.width_total
+      size.height_left = size.height_total
+    }
+    //lef son is concat, right son is view
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") )
+    {
+      size.width_left = size.width_total
+      size.height_left = size.height_total
+    }
+    calcul_taille_v2(template, 2 * index + 2, size)
+    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+      size.width_right = size.width
+      size.height_right = size.height
+    }
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]=="hconcat" || template[2*index+2]=="vconcat") )
+    {
+      size.width_right = size.width_total
+      size.height_right = size.height_total
+    }
+    //lef son is concat, right son is view
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") )
+    {
+      size.width_right = size.width
+      size.height_right = size.height
+    }
+    size.width_total=size.width_left+size.width_right
+    size.height_total=which_is_max(size.height_left,size.height_right)
+  }
+  else if(template[index]=="vconcat")
+  {
+    calcul_taille_v2(template, 2 * index + 1, size)
+    //2 sons are views
+    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+      size.width_left = size.height
+      size.height_left = size.height
+    }
+    //2 sons are concat
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]=="hconcat" || template[2*index+2]=="vconcat") )
+    {
+      size.width_left = size.width_total
+      size.height_left = size.height_total
+    }
+    //lef son is concat, right son is view
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") )
+    {
+      size.width_left = size.width_total
+      size.height_left = size.height_total
+    }
+    calcul_taille_v2(template, 2 * index + 2, size)
+    if(template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") {
+      size.width_right = size.width
+      size.height_right = size.height
+    }
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]=="hconcat" || template[2*index+2]=="vconcat") )
+    {
+      size.width_right = size.width_total
+      size.height_right = size.height_total
+    }
+    //lef son is concat, right son is view
+    else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat") )
+    {
+      size.width_right = size.width
+      size.height_right = size.height
+    }
+    //for width
+    size.width_total=which_is_max(size.width_left,size.width_right)
+    //for height
+    size.height_total=size.height_left+size.height_right
+  }
+  else
+  {
+    if(template[index].hasOwnProperty("width"))
+    {
+        //!!!!!now we just talk about the case that width is a number!!!!!!
+        size.width=template[index].width
+    }
+    else //objet don't set this attribut, need to do other check
+    {
+      //!!!!!!now we just use 200 to have a try
+      size.width=200
+    }
+
+    if(template[index].hasOwnProperty("height"))
+    {
+      //!!!!!now we just talk about the case that width is a number!!!!!!
+      size.height=template[index].height
+    }
+    else //objet don't set this attribut, need to do other check
+    {
+      //!!!!!!now we just use 200 to have a try
+      size.height=200
+    }
+  }
+
+}
+calcul_taille_v2(template,0,size)
+console.log("width="+ size.width_total)
+console.log("height="+ size.height_total)
+
 
 
