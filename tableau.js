@@ -224,6 +224,11 @@ function create_vega_tree(concatList,template,vlSpec,cursor)
     }        
   }
 
+function calcul_taille(vegaObjet)
+{
+  
+}
+
   // Vega-Lite specification
 let vlSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -285,7 +290,7 @@ visConfig.addEventListener('submit',(event)=>
     console.log(layoutList)
     console.log(template)
 
-
+//show all choice user can choose
    for(let i=0;i<layoutList.length;i++)
    {
       let newOp=document.createElement("option")
@@ -295,13 +300,14 @@ visConfig.addEventListener('submit',(event)=>
    }
   })
 
-// Event listeners for refresh the page
+// Event listeners for refreshing the page
 let refreshButton=document.getElementById("refresh")
 refreshButton.addEventListener("click",(event)=>
 {
     document.location.reload()
 })
 
+//Event listeners for creating template from user's choice, updateing the element Vega-Lite and showing element Vega-Lite
 concatOp.addEventListener("change",(event)=>
 {
     let choix=event.target.value
@@ -336,6 +342,12 @@ concatOp.addEventListener("change",(event)=>
     let concatList=[]
     create_vega_tree(concatList,templateUse,vlSpec,0)
     console.log(vlSpec)
+
+    //calcul taille
+
+
+
+
     vegaEmbed('#vis', vlSpec);
 
 })
