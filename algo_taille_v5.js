@@ -1,4 +1,6 @@
 // Constants for concat types
+import _ from "lodash";
+
 const h="hconcat"
 const v="vconcat"
 
@@ -112,6 +114,26 @@ const v9={
 let visualisation=[
     v0,v1,v2,v3,v4,v5,v6,v7,v8,v9
 ]
+/*
+function swapElements(array, index1, index2){
+    //deep copy:array has objet
+    let new_array=_.cloneDeep(array);
+    let temp = new_array[index1];
+    new_array[index1] = new_array[index2];
+    new_array[index2] = temp;
+    return new_array;
+}*/
+
+
+function swapElements(array, index1, index2){
+    //deep copy:array has objet
+    let new_array=_.cloneDeep(array);
+    let temp = new_array[index1];
+    new_array[index1] = new_array[index2];
+    new_array[index2] = temp;
+    return new_array;
+}
+
 
 //template width:   height:
 let template8=["hconcat","vconcat","hconcat","vconcat","hconcat","vconcat","hconcat","vconcat","vconcat",v1,v2,v4,v7,v9,v3,v6,v8,v0,v5]
@@ -242,16 +264,79 @@ let size={
 }
 function calcul_template_taille(template,index,nbConcat)
 {
-    size.width=tailleX(template,0,nbConcat)
-    size.height=tailleY(template,0,nbConcat)
+    let surface=tailleX(template,0,nbConcat)*tailleY(template,0,nbConcat)
+    return surface
 }
-
+/*
 for(let i=0;i<list_temp.length;i++)
 {
     let nbConcat=concat_view[i][0]
-    calcul_template_taille(list_temp[i],0,nbConcat)
+    let surface=calcul_template_taille(list_temp[i],0,nbConcat)
     console.log(i+":")
-    console.log("width="+size.width)
-    console.log("height="+size.height)
+    console.log("surface="+surface)
+  //  console.log("height="+taille[1])
     console.log()
 }
+*/
+
+/**
+ * hill climing algo
+ * function hill_climbing(f, x0) {
+ * let x = x0; // initial solution
+ * while (true) {
+ * 	const neighbors = generate_neighbors(x); // generate neighbors of x
+ * 	const best_neighbor = neighbors.reduce((a, b) => f(a) > f(b) ? a : b); // find the neighbor with the highest function value
+ * 	if (f(best_neighbor) <= f(x)) { // if the best neighbor is not better than x, stop
+ * 	return x;
+ * 	}
+ * 	x = best_neighbor; // otherwise, continue with the best neighbor
+ * }
+ * }
+ */
+
+function variation(template,nbConcat,nbView)
+{
+    let randomC_1= 0;
+    let randomC_2= 0;
+    let randomV_1=0;
+    let randomV_2=0;
+    while(randomC_1 == randomC_2)
+    {
+        randomC_1= Math.floor(Math.random() * nbConcat);
+        randomC_2= Math.floor(Math.random() * nbConcat);
+    }
+    let tem_template=swapElements(template,randomC_1,randomC_2);
+    while(randomV_1==randomV_2)
+    {
+        randomV_1=Math.floor(Math.random() * (nbConcat+nbView - nbConcat) + nbConcat);
+        randomV_2=Math.floor(Math.random() * (nbConcat+nbView - nbConcat) + nbConcat);
+    }
+    return swapElements(tem_template,randomV_1,randomV_2);
+
+}
+
+function compare_template_taille(template, nbConcat, nbView,nbIteration)
+{
+    let init_template=_.cloneDeep(template)
+    console.log(calcul_template_taille(init_template,0,nbConcat))
+    while (nbIteration>0)
+    {
+        let template2=variation(init_template,nbConcat,nbView)
+        if( calcul_template_taille(template2,0,nbConcat) < calcul_template_taille(init_template,0,nbConcat) )
+        {
+            init_template=_.cloneDeep(template2)
+            console.log(calcul_template_taille(init_template,0,nbConcat))
+        }
+        nbIteration--
+    }
+    return init_template;
+}
+
+
+console.log('*********************************************hill climbing*************************************************')
+//let template2=["hconcat","vconcat","vconcat",v7,v1,v0,v6]
+let result=compare_template_taille(template7,8,9,100000)
+console.log('the result is')
+console.log(result)
+console.log('size is:')
+console.log(calcul_template_taille(result,0,8))
