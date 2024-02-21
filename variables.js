@@ -113,3 +113,12 @@ export let vlSpec = {
         "url":"iris.csv"
     }
 }
+
+export let size= {
+    width: 0,
+    height: 0
+}
+
+// Constants for concat types
+export const h="hconcat"
+export const v="vconcat"

@@ -1,117 +1,11 @@
-// Constants for concat types
-const h="hconcat"
-const v="vconcat"
+import {visualisation} from "./variables.js";
+import {melange_concat_view} from "./functions.js";
+import {create_template_concat} from "./functions.js";
+import {create_template_view} from "./functions.js";
+import {vlSpec} from "./variables.js";
+import {create_vega_tree} from "./functions.js";
 
-// Data for concatenation view
-let concat_view=[
-  [1,2],
-  [2,3],
-  [3,4],
-  [4,5],
-  [5,6],
-  [6,7],
-  [7,8],
-  [8,9],
-  [9,10]
-]
 
-// Visualizations
-const v0={
-  width:350,
-  height:300,
-  mark: 'boxplot',
-  encoding: {
-  x: {field: 'species', type: 'nominal'},
-  y: {field: 'petal_width', type: 'quantitative'}
-  }
-}
-const v1={
-  width:350,
-  height:300,
-  mark: 'bar',
-  encoding: {
-  y: {field: 'species', type: 'nominal'},
-  x: {
-    aggregate: 'average',field: 'sepal_length',type: 'quantitative'}
-  }     
-}
-const v2={
-  width:350,
-      height:300,
-      mark: 'point',
-      encoding: {
-      y: {field: 'species', type: 'nominal'},
-      x: { aggregate: 'average',field: 'sepal_width',type: 'quantitative'}
-      }
-}
-const v3={
-  width:200,
-      height:200,
-      mark:'arc',
-      encoding: {
-            theta:{aggregate:'average' ,field:'petal_length',type: 'quantitative'},
-            color:{field:'species',type:"nominal"}
-      }
-}
-const v4={
-  mark: 'errorbar',
-  encoding: {
-    x: {field: "sepal_length", type: "quantitative", scale: {"zero": false}},
-    y: {field: "species", type: "ordinal"}
-    }
-}
-
-const v5={
-  width:350,
-  height:300,
-  mark: 'circle',
-  encoding: {
-  y: {field: 'petal_width', type: 'quantitative'},
-  x: {field: 'sepal_width',type: 'quantitative'}
-  }  
-}
-const v6={
-  width:350,
-  height:300,
-  mark: 'circle',
-  encoding: {
-  y: {field: 'petal_width', type: 'quantitative'},
-  x: {field: 'petal_width',type: 'quantitative'}
-  }  
-}
-const v7={
-  mark: "rule",
-  encoding: {
-    y: {
-      field: "petal_width",
-      type: "quantitative",
-      aggregate: "mean"
-    },
-    size: {value: 2},
-    color: {field: "species", type: "nominal"}
-  }
-}
-const v8={
-  mark: 'errorbar',
-  encoding: {
-    x: {field: "petal_width", type: "quantitative", scale: {"zero": false}},
-    y: {field: "species", type: "ordinal"}
-    }
-
-}
-const v9={
-  width:350,
-  height:300,
-  mark: 'circle',
-  encoding: {
-  y: {field: 'petal_length', type: 'quantitative'},
-  x: {field: 'sepal_length',type: 'quantitative'}
-  }     
-}
-
-let visualisation=[
-  v0,v1,v2,v3,v4,v5,v6,v7,v8,v9
-]
 
 // Arrays for template generation
 let tableauC=[]
@@ -121,51 +15,8 @@ let tableauV=[]
 let templateTotal=[]
 
 // Function to create a new tableau by concatenating part concat and part visualisation
-function melange_concat_view(templateTotal,tableauC,tableauV)
-{
-  tableauC.forEach(elementC => {
-    tableauV.forEach(elementV => {
-        let newTableau=elementC.concat(elementV)
-        templateTotal.push(newTableau)
-    });
-  });
-}
 
 // Function to create concatenation part for a template
-function create_template_concat(tableau,list, nbConcat,typeConcat)
-{
-  if(nbConcat==1)
-  {
-    list[nbConcat-1]=typeConcat
-    let tamp=[...list]
-    tableau.push(tamp)
-  }
-  else{
-    list[nbConcat-1]=typeConcat
-      create_template_concat(tableau,list,nbConcat-1,h)
-      create_template_concat(tableau,list,nbConcat-1,v)
-
-  }
-}
-
-// Function to create visualisation part for a template
-function create_template_view(tableau,list,cursor,nbView)
-{
-  if(cursor==nbView)
-  {
-    let tamp=[...list]
-    tableau.push(tamp)
-  }
-  else
-  {
-    for(let j=cursor;j<nbView;j++)
-    {
-      swapElements(list,j,cursor)
-      create_template_view(tableau,list,cursor+1,nbView)
-      swapElements(list,j,cursor)
-    }
-  }
-}
 
 // Function to exchange two element in an array
 function swapElements(array, index1, index2){
@@ -175,67 +26,7 @@ function swapElements(array, index1, index2){
 }
 
 //function to update vega-lite objet using template choosen
-function create_vega_tree(concatList,template,vlSpec,cursor)
-  {      
-    if(cursor<template.length)
-    {
-      if(template[cursor]=="vconcat")
-      {
-        if(cursor==0)
-        {
-          vlSpec.vconcat=concatList
-          create_vega_tree(concatList,template,vlSpec,2*cursor+1)
-          create_vega_tree(concatList,template,vlSpec,2*cursor+2)
-        }
-        else
-        { 
-          let obj={ vconcat:[] }
-          concatList.push(obj)
-          let list=obj.vconcat
-          create_vega_tree(list,template,vlSpec,2*cursor+1)
-          create_vega_tree(list,template,vlSpec,2*cursor+2)
-        }           
-      }
-      else if(template[cursor]=="hconcat")
-      {
-        if(cursor==0)
-        {
-          vlSpec.hconcat=concatList
-          create_vega_tree(concatList,template,vlSpec,2*cursor+1)
-          create_vega_tree(concatList,template,vlSpec,2*cursor+2)
-        }
-        else
-        {
-          let obj={ hconcat:[] }
-          concatList.push(obj)
-          let list=obj.hconcat
-          create_vega_tree(list,template,vlSpec,2*cursor+1)
-          create_vega_tree(list,template,vlSpec,2*cursor+2)
-        }
-        
-      }
-      else
-      {
-        //push view objet
-        concatList.push(template[cursor])
-        create_vega_tree(concatList,template,2*cursor+1)
-        create_vega_tree(concatList,template,2*cursor+2)
-      }
-    }        
-  }
 
-function calcul_taille(vegaObjet)
-{
-  
-}
-
-  // Vega-Lite specification
-let vlSpec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: {
-      "url":"iris.csv"
-    }
-}
 
 // Event listeners for form submission and interaction
 let visConfig=document.getElementById("visConf")
@@ -342,10 +133,6 @@ concatOp.addEventListener("change",(event)=>
     let concatList=[]
     create_vega_tree(concatList,templateUse,vlSpec,0)
     console.log(vlSpec)
-
-    //calcul taille
-
-
 
 
     vegaEmbed('#vis', vlSpec);
