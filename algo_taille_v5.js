@@ -1,6 +1,6 @@
 // Constants for concat types
-import {calcul_template_taille,compare_template_taille} from "./functions.js"
-import {v0,v1,v2,v3,v4,v5,v6,v7,v8,v9} from "./variables.js";
+import {calcul_template_taille,compare_template_taille,variation} from "./functions.js"
+import {concat_view, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9} from "./variables.js";
 
 
 
@@ -53,8 +53,15 @@ for(let i=0;i<list_temp.length;i++)
 
 console.log('*********************************************hill climbing*************************************************')
 //let template2=["hconcat","vconcat","vconcat",v7,v1,v0,v6]
-let result=compare_template_taille(template7,8,9,100000)
+/*let result=compare_template_taille(template7,8,9,100000)
 console.log('the result is')
 console.log(result)
-console.log('size is:')
-console.log(calcul_template_taille(result,0,8))
+console.log('length is:')
+console.log(result.length)*/
+
+let i=10
+while (i>0){
+    let res=variation(template5,6,7,i)
+    console.log(res)
+    i-=1
+}

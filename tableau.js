@@ -1,51 +1,41 @@
-import {visualisation} from "./variables.js";
-import {melange_concat_view} from "./functions.js";
+import {v, visualisation,h} from "./variables.js";
+import {calcul_template_taille, compare_template_taille, melange_concat_view} from "./functions.js";
 import {create_template_concat} from "./functions.js";
 import {create_template_view} from "./functions.js";
-import {vlSpec} from "./variables.js";
+import {vlSpec,vlSpec1} from "./variables.js";
 import {create_vega_tree} from "./functions.js";
 
 
-
-// Arrays for template generation
+// Tableaux pour la génération de modèles
+//concat list
 let tableauC=[]
-let list_template1=[""]
-let list_template2=[""]
+let list_template1=[]
+let list_template2=[]
+//view list
 let tableauV=[]
+//modèle total
 let templateTotal=[]
-
-// Function to create a new tableau by concatenating part concat and part visualisation
-
-// Function to create concatenation part for a template
-
-// Function to exchange two element in an array
-function swapElements(array, index1, index2){
-  let temp = array[index1];
-  array[index1] = array[index2];
-  array[index2] = temp;
-}
-
-//function to update vega-lite objet using template choosen
+//modèle aleatoire
+let template_aleatoire=[]
+//modèle optimisé
+let template_optimimse=[]
 
 
 // Event listeners for form submission and interaction
 let visConfig=document.getElementById("visConf")
-let affichage=document.getElementById("affichage")
-let concatOp=document.getElementById("concatOp")
 visConfig.addEventListener('submit',(event)=>
   {
-    //get user submission
+    //get user submission: number of View
     event.preventDefault()
-    let nbView = document.getElementById("nbView").value
-    let nbLayout=document.getElementById("nbLayout").value
+    let nbView = parseInt(document.getElementById("nbView").value)
     console.log(nbView)
-    console.log(nbLayout)
 
-    //create template
+    //create template(concat part)
     let element=[nbView-1,nbView]
     create_template_concat(tableauC,list_template1,element[0],h)
     create_template_concat(tableauC,list_template2,element[0],v)
 
+    //choisir des views utilisé
     let listV=[]
     for(let i=0;i<element[1];i++)
     {
@@ -60,35 +50,46 @@ visConfig.addEventListener('submit',(event)=>
         }
       }
     }
-   
+   //create template(view part)
     create_template_view(tableauV,listV,0,element[1])
 
+//get all results possibles with the same number of view and number of concat
     melange_concat_view(templateTotal,tableauC,tableauV)
-    console.log(templateTotal)
-    let layoutList=[]
-    let template=[]
-    while(layoutList.length!=nbLayout)
+    //choisir aleatoire modèle
+    let choix=Math.floor(Math.random()*templateTotal.length)
+    template_aleatoire=templateTotal[choix]
+    console.log(template_aleatoire)
+  //Remplacez les numéros dans la partie view par les objets de views correspondants
+    for(let i=element[0];i<template_aleatoire.length;i++)
     {
-      let choix=Math.floor(Math.random()*templateTotal.length)
-      let layout=templateTotal[choix].slice(0,nbView-1)
-      if(!layoutList.includes(layout))
-      {
-        layoutList.push(layout)
-        template.push(templateTotal[choix])
-      }
+      template_aleatoire[i]=visualisation[template_aleatoire[i]]
     }
+    console.log("template alea")
+    console.log(template_aleatoire)
+  //calculer la taille du modèle aleatoire, set value
+    document.getElementById("size_rand").innerHTML=calcul_template_taille(template_aleatoire,0,element[0]).toString()
+  //créer un objet pour vega-lite
+    let concatList=[]
+    create_vega_tree(concatList,template_aleatoire,vlSpec,0)
+    console.log(vlSpec)
+  //afficher le graphique
+    vegaEmbed('#aleatoire', vlSpec);
 
-    console.log(layoutList)
-    console.log(template)
+    //obtenir resultat optimisé
+    template_optimimse=compare_template_taille(template_aleatoire,element[0],element[1],100000)
+    console.log('the result is')
+    console.log(template_optimimse)
+    console.log('size is:')
+    console.log(calcul_template_taille(template_optimimse,0,element[0]))
+  //calculer la taille du modèle optimisé, set value
+    document.getElementById("size_opti").innerHTML=calcul_template_taille(template_optimimse,0,element[0]).toString()
+    concatList=[]
+  //créer un objet pour vega-lite
+    create_vega_tree(concatList,template_optimimse,vlSpec1,0)
+    console.log(vlSpec1)
+  //afficher le graphique
+    vegaEmbed('#optimisation', vlSpec1);
 
-//show all choice user can choose
-   for(let i=0;i<layoutList.length;i++)
-   {
-      let newOp=document.createElement("option")
-      newOp.value=template[i]
-      newOp.textContent=template[i].slice(0,nbView-1)
-      concatOp.appendChild(newOp)
-   }
   })
 
 // Event listeners for refreshing the page
@@ -98,46 +99,6 @@ refreshButton.addEventListener("click",(event)=>
     document.location.reload()
 })
 
-//Event listeners for creating template from user's choice, updateing the element Vega-Lite and showing element Vega-Lite
-concatOp.addEventListener("change",(event)=>
-{
-    let choix=event.target.value
-    console.log(choix)
-    let nbView = document.getElementById("nbView").value
-    let templateUse=[]
-    for(let i=0;i<nbView-1;i++)
-    {
-      let concat
-      if(i==0)
-      {
-        concat=choix.slice(i*7,7*(i+1))
-      }
-      if(i!=0)
-      {
-        concat=choix.slice(8*i,8*i+7)
-      }
-      templateUse.push(concat)
-    }  
-    for(let i=0;i<nbView;i++)
-    {
-      let view=choix[8*(nbView-1)+2*i]
-      templateUse.push(view)
-    }
-    console.log(templateUse)
-    let template=[...templateUse]
-    for(let i=nbView-1;i<template.length;i++)
-    {
-      templateUse[i]=visualisation[template[i]]
-    } 
-    console.log(templateUse)
-    let concatList=[]
-    create_vega_tree(concatList,templateUse,vlSpec,0)
-    console.log(vlSpec)
-
-
-    vegaEmbed('#vis', vlSpec);
-
-})
   
 
 

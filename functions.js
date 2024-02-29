@@ -1,5 +1,12 @@
-import _ from "lodash";
+import {h, v,} from "./variables.js"
 
+/**
+ * @description fonction pour obtenir toutes les possibilités du module en combinant la partie concat et la partie view
+ * @param templateTotal: {array} toutes les possibilités de module
+ * @param tableauC:{array} toutes les possibilités de séquence de concaténation
+ * @param tableauV {array} toutes les possibilités de séquence de views
+ * @author jiawei Chen
+ */
 export function melange_concat_view(templateTotal,tableauC,tableauV)
 {
     tableauC.forEach(elementC => {
@@ -10,7 +17,14 @@ export function melange_concat_view(templateTotal,tableauC,tableauV)
     });
 }
 
-
+/**
+ * @description Créer la partie concat du modèle
+ * @param tableau {array}
+ * @param list {array}
+ * @param nbConcat {number}
+ * @param typeConcat {string}
+ * @author jiawei Chen
+ */
 export function create_template_concat(tableau,list, nbConcat,typeConcat)
 {
     if(nbConcat==1)
@@ -27,6 +41,14 @@ export function create_template_concat(tableau,list, nbConcat,typeConcat)
     }
 }
 
+/**
+ * @description Créer la partie view du modèle
+ * @param tableau {array}
+ * @param list {array}
+ * @param cursor {number}
+ * @param nbView {number}
+ * @author jiawei Chen
+ */
 export function create_template_view(tableau,list,cursor,nbView)
 {
     if(cursor==nbView)
@@ -38,13 +60,21 @@ export function create_template_view(tableau,list,cursor,nbView)
     {
         for(let j=cursor;j<nbView;j++)
         {
-            swapElements(list,j,cursor)
+            swapElements_v1(list,j,cursor)
             create_template_view(tableau,list,cursor+1,nbView)
-            swapElements(list,j,cursor)
+            swapElements_v1(list,j,cursor)
         }
     }
 }
 
+/**
+ * @description créer un objet Vega-lite
+ * @param concatList {array}
+ * @param template {array}
+ * @param vlSpec {object}
+ * @param cursor {number}
+ * @author jiawei Chen
+ */
 export  function create_vega_tree(concatList,template,vlSpec,cursor)
 {
     if(cursor<template.length)
@@ -88,21 +118,19 @@ export  function create_vega_tree(concatList,template,vlSpec,cursor)
         {
             //push view objet
             concatList.push(template[cursor])
-            create_vega_tree(concatList,template,2*cursor+1)
-            create_vega_tree(concatList,template,2*cursor+2)
+            create_vega_tree(concatList,template,vlSpec,2*cursor+1)
+            create_vega_tree(concatList,template,vlSpec,2*cursor+2)
         }
     }
 }
 
-export function swapElements(array, index1, index2){
-    //deep copy:array has objet
-    let new_array=_.cloneDeep(array);
-    let temp = new_array[index1];
-    new_array[index1] = new_array[index2];
-    new_array[index2] = temp;
-    return new_array;
-}
-
+/**
+ * @description obtenir le maximum entre les deux values
+ * @param num1 {number}
+ * @param num2 {number}
+ * @returns {number}
+ * @author jiawei Chen
+ */
 export function which_is_max(num1,num2)
 {
     if(num1>=num2)
@@ -111,28 +139,56 @@ export function which_is_max(num1,num2)
         return num2
 }
 
+/**
+ * @description  Calculer la largeur d'une visualisation
+ * @param {Object} view
+ * @returns {number}
+ * @author jiawei Chen
+ */
 export function calcul_X(view)
 {
-    if(view.hasOwnProperty("width"))
+    if(view)
     {
-        //!!!!!!now we just talk about the case that width is a number!!!!!!
-        return view.width
+        if(view.hasOwnProperty("width"))
+        {
+            //!!!!!!now we just talk about the case that width is a number!!!!!!
+            return view.width
+        }
+        else //objet don't set this attribut, need to do other check
+        {return 200}
     }
-    else //objet don't set this attribut, need to do other check
-    {return 200}
+
 }
 
+/**
+ * @description Calculer la hauteur d'une visualisation
+ * @param {Object} view
+ * @returns {number}
+ * @author jiawei Chen
+ */
 export function calcul_Y(view)
 {
-    if(view.hasOwnProperty("height"))
-    {
-        //!!!!!!now we just talk about the case that width is a number!!!!!!
-        return view.height
+    if(view){
+        if(view.hasOwnProperty("height"))
+        {
+            //!!!!!!now we just talk about the case that width is a number!!!!!!
+            return view.height
+        }
+        else //objet don't set this attribut, need to do other check
+        {return 200}
     }
-    else //objet don't set this attribut, need to do other check
-    {return 200}
+
 }
 
+
+/**
+ * @description Calculer la largeur totale d'un modèle
+ * @param template {array}
+ * @param index {number}
+ * @param nbConcat {number}
+ * @returns {number}
+ * @author jiawei Chen
+ */
 export function tailleX(template, index,nbConcat)
 {
     if(index < nbConcat)
@@ -172,6 +228,14 @@ export function tailleX(template, index,nbConcat)
     }
 }
 
+/**
+ * @description Calculer la hauteur totale d'un modèle
+ * @param template {array}
+ * @param index {number}
+ * @param nbConcat {number}
+ * @returns {number}
+ * @author jiawei Chen
+ */
 export function tailleY(template,index,nbConcat)
 {
     if(index < nbConcat)
@@ -211,48 +275,111 @@ export function tailleY(template,index,nbConcat)
     }
 }
 
-
+/**
+ * @description Calculez la surface totale d'un modèle
+ * @param template {array}
+ * @param index {number}
+ * @param nbConcat {number}
+ * @returns {number}
+ * @author jiawei Chen
+ */
 export function calcul_template_taille(template,index,nbConcat)
 {
     let surface=tailleX(template,0,nbConcat)*tailleY(template,0,nbConcat)
     return surface
 }
 
-
-export function variation(template,nbConcat,nbView)
+/**
+ * @description Ajustement de l'ordre dans le modèle : la section concat et la section view sont ajustées séparément
+ * @param template {array}
+ * @param nbConcat {number}
+ * @param nbView {number}
+ * @param nbIteration {number}
+ * @returns {array}
+ * @author jiawei Chen
+ */
+export function variation(template,nbConcat,nbView,nbIteration)
 {
+    let new_array=structuredClone(template)
     let randomC_1= 0;
     let randomC_2= 0;
     let randomV_1=0;
     let randomV_2=0;
-    while(randomC_1 == randomC_2)
-    {
-        randomC_1= Math.floor(Math.random() * nbConcat);
-        randomC_2= Math.floor(Math.random() * nbConcat);
+    let ite
+    if(Math.random()<0.5){
+         ite=3
     }
-    let tem_template=swapElements(template,randomC_1,randomC_2);
-    while(randomV_1==randomV_2)
-    {
-        randomV_1=Math.floor(Math.random() * (nbConcat+nbView - nbConcat) + nbConcat);
-        randomV_2=Math.floor(Math.random() * (nbConcat+nbView - nbConcat) + nbConcat);
+    else{
+         ite=5
     }
-    return swapElements(tem_template,randomV_1,randomV_2);
 
+    if(nbIteration%2==0)
+    {
+        //we swap concat
+        while(ite>0)
+        {
+            do
+            {
+                randomC_1= Math.floor(Math.random() * nbConcat);
+                randomC_2= Math.floor(Math.random() * nbConcat);
+            }while(randomC_1 == randomC_2)
+            swapElements_v1(new_array,randomC_1,randomC_2);
+            ite-=1
+        }
+    }
+    else
+    {
+        //we swap view
+        while(ite>0)
+        {
+            do
+            {
+                randomV_1=Math.floor(Math.random() * (nbConcat+nbView - nbConcat) + nbConcat);
+                randomV_2=Math.floor(Math.random() * (nbConcat+nbView - nbConcat) + nbConcat);
+                swapElements_v1(new_array,randomV_1,randomV_2);
+            }while(randomV_1==randomV_2)
+            ite-=1
+        }
+    }
+    return new_array
 }
 
+/**
+ * @description Obtenez un graphique avec une surface totale plus petite en ajustant l'ordre à l'intérieur du modèle.
+ * @param {Array} template
+ * @param {number} nbConcat
+ * @param {number} nbView
+ * @param {number} nbIteration
+ * @returns {Array}
+ * @author jiawei Chen
+ */
 export function compare_template_taille(template, nbConcat, nbView,nbIteration)
 {
-    let init_template=_.cloneDeep(template)
-    console.log(calcul_template_taille(init_template,0,nbConcat))
+    //copier le modèlé initial et calculer son surface
+    let init_template=structuredClone(template)
+    let size_init=calcul_template_taille(init_template,0,nbConcat)
     while (nbIteration>0)
     {
-        let template2=variation(init_template,nbConcat,nbView)
-        if( calcul_template_taille(template2,0,nbConcat) < calcul_template_taille(init_template,0,nbConcat) )
+        let template2=variation(init_template,nbConcat,nbView,nbIteration)
+        let size_opti=calcul_template_taille(template2,0,nbConcat)
+        if( size_opti< size_init)
         {
-            init_template=_.cloneDeep(template2)
-            console.log(calcul_template_taille(init_template,0,nbConcat))
+            init_template=structuredClone(template2)
         }
         nbIteration--
     }
     return init_template;
+}
+
+/**
+ * @description Fonction pour échanger deux éléments dans un tableau
+ * @param array {array}
+ * @param index1 {number}
+ * @param index2 {number}
+ * @author jiawei Chen
+ */
+export function swapElements_v1(array, index1, index2){
+    let temp = array[index1];
+    array[index1] = array[index2];
+    array[index2] = temp;
 }
