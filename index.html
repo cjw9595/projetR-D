@@ -3,11 +3,10 @@
 <head>
   <title>Vega-Lite dashboard</title>
   <meta charset="utf-8" />
-
   <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.16.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.2"></script>
-  <script src="tableau.js" defer></script>
+  <script src="tableau.js" type="module" defer></script>
   <style media="screen">
     /* Add space between Vega-Embed links  */
     .vega-actions a {
@@ -19,26 +18,31 @@
 <h1>Template for Embedding Vega-Lite Visualization</h1>
 <!-- Container for the visualization -->
 <div id="concat">
+  <!-- get nombre de la visualisation -->
   <form id="visConf">
     <label>Input the nombre of Visualisation </label>
     <input type="number" id="nbView" name="View" min="2" max="10"  required /><br>
-    <label>Input the nombre of layout </label>
-    <input type="number" id="nbLayout" name="layout" min="1" required /><br>
-    <button>Submit</button>
+    <input id="submit" type="submit">
   </form>
+<br>
+  <!-- refresh la page  -->
+  <div>
+    <button id="refresh">Refresh</button>
+  </div>
   <br>
   <br>
 </div>
 <div id="affichage">
-  <label>Templates you can choose: </label><br>
-  <select id="concatOp">
-  </select>
-
+  <!--afficher le module aleatoire et son surface total -->
+  <label>random template: </label>
+  <p id="size_rand"></p><br>
+  <div id="aleatoire" ></div>
+<br>
+  <!--afficher le module optimisé et son surface total -->
+  <label>Optimized template:</label>
+  <p id="size_opti"></p><br>
+  <div id="optimisation"></div>
 </div>
 <br>
-<div id=""refresh>
-  <button id="refresh">Refresh</button>
-</div>
-<div id="vis"></div>
 </body>
 </html>
