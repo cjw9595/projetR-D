@@ -77,7 +77,7 @@ visConfig.addEventListener('submit',(event)=>
 
     //obtenir resultat optimisé
     template_optimimse=compare_template_taille(template_aleatoire,element[0],element[1],100000)
-    console.log('the result is')
+    console.log('the result opti is')
     console.log(template_optimimse)
     console.log('size is:')
     console.log(calcul_template_taille(template_optimimse,0,element[0]))

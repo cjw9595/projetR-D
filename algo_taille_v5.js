@@ -21,7 +21,7 @@ let template=["hconcat","vconcat","hconcat","vconcat",v2,v4,v3,v8,v5]
 
 
 
-
+/*
 for(let i=0;i<list_temp.length;i++)
 {
     let nbConcat=concat_view[i][0]
@@ -31,7 +31,7 @@ for(let i=0;i<list_temp.length;i++)
   //  console.log("height="+taille[1])
     console.log()
 }
-
+*/
 
 /**
  * hill climing algo
@@ -53,15 +53,14 @@ for(let i=0;i<list_temp.length;i++)
 
 console.log('*********************************************hill climbing*************************************************')
 //let template2=["hconcat","vconcat","vconcat",v7,v1,v0,v6]
-/*let result=compare_template_taille(template7,8,9,100000)
+let surface=calcul_template_taille(template0,0,1)
 console.log('the result is')
-console.log(result)
-console.log('length is:')
-console.log(result.length)*/
+console.log(surface)
 
+/*
 let i=10
 while (i>0){
     let res=variation(template5,6,7,i)
     console.log(res)
     i-=1
-}
+}*/
