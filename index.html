@@ -20,8 +20,10 @@
 <div id="concat">
   <!-- get nombre de la visualisation -->
   <form id="visConf">
-    <label>Input the nombre of Visualisation </label>
+    <label>Entrer le nombre du graphique: </label>
     <input type="number" id="nbView" name="View" min="2" max="10"  required /><br>
+    <label>Entrer le nombre d'itérations pour l'optimisation : </label>
+    <input type="number" id="nbIteration" name="Iteration" min="1"   required /><br>
     <input id="submit" type="submit">
   </form>
 <br>
@@ -34,12 +36,12 @@
 </div>
 <div id="affichage">
   <!--afficher le module aleatoire et son surface total -->
-  <label>random template: </label>
+  <label>random model: </label>
   <p id="size_rand"></p><br>
   <div id="aleatoire" ></div>
 <br>
   <!--afficher le module optimisé et son surface total -->
-  <label>Optimized template:</label>
+  <label>Optimized model:</label>
   <p id="size_opti"></p><br>
   <div id="optimisation"></div>
 </div>

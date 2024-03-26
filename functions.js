@@ -1,4 +1,4 @@
-import {h, v,} from "./variables.js"
+import {h, v, visualisation,} from "./variables.js"
 
 /**
  * @description fonction pour obtenir toutes les possibilités du module en combinant la partie concat et la partie view
@@ -411,4 +411,38 @@ export function swapElements_v1(array, index1, index2){
     let temp = array[index1];
     array[index1] = array[index2];
     array[index2] = temp;
+}
+
+export function test(list_iteration,nbTest,value,templateTotal,nbC)
+{
+        //try nbTest times
+        for(let k=0;k<nbTest;k++)
+        {
+            //choose random to get a model
+            let choix=Math.floor(Math.random()*templateTotal.length)
+            let template_test=structuredClone(templateTotal[choix])
+            //Remplacez les numéros dans la partie view par les objets de views correspondants
+            for(let i=nbC;i<template_test.length;i++)
+            {
+
+                template_test[i]=visualisation[template_test[i]]
+            }
+            //try value in list_iteraion
+            for (const choixKey in list_iteration) {
+                //get result of fonction compare_taille minimal size
+                let template_final=compare_template_taille(template_test,nbC,nbC+1,list_iteration[choixKey])
+                let surface=calcul_template_taille(template_final,0,nbC)
+                //save in a objet data
+                let obj={}
+                //obj.nbConcat=nbC
+                obj.nbitration=list_iteration[choixKey]
+                obj.size=surface
+                obj.nbConcat=nbC
+
+                value.push(obj)
+            }
+
+        }
+
+
 }
