@@ -1,17 +1,5 @@
-/* nombre de concat et de view correspondant */
-export let concat_view=[
-    [1,2],
-    [2,3],
-    [3,4],
-    [4,5],
-    [5,6],
-    [6,7],
-    [7,8],
-    [8,9],
-    [9,10]
-]
 
-/* les objets visualisation */
+/* les objets graphiques */
 export const v0={
     width:350,
     height:300,
@@ -114,16 +102,17 @@ export let visualisation=[
 export let vlSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: {
-        "url":"iris.csv"
-    }
-}
-export let vlSpec1 = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: {
-        "url": "iris.csv"
+        "url":"data/iris.csv"
     }
 }
 
-/*Constantes pour les types concat*/
+export let vlSpec1 = {
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    data: {
+        "url": "data/iris.csv"
+    }
+}
+
+/*Constantes pour les types de la concaténation*/
 export const h="hconcat"
 export const v="vconcat"
