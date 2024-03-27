@@ -1,7 +1,7 @@
 import {h, v, visualisation,} from "./variables.js"
 
 /**
- * @description fonction pour obtenir toutes les possibilités du module en combinant la partie concat et la partie view
+ * @description fonction pour obtenir toutes les possibilités du module en combinant la partie concaténation et la partie visualisation
  * @param templateTotal: {array} toutes les possibilités de module
  * @param tableauC:{array} toutes les possibilités de séquence de concaténation
  * @param tableauV {array} toutes les possibilités de séquence de views
@@ -19,11 +19,11 @@ export function melange_concat_view(templateTotal,tableauC,tableauV)
 }
 
 /**
- * @description Créer la partie concat du modèle
- * @param tableau {array}
- * @param list {array}
- * @param nbConcat {number}
- * @param typeConcat {string}
+ * @description Créer toutes les possibilités de la partie concat du modèle selon le nombre et le type de concaténation
+ * @param tableau {array}  stocker toutes les possibilités
+ * @param list {array}   possibilité actuelle
+ * @param nbConcat {number} nombre de concaténation
+ * @param typeConcat {string}  type de concaténation
  * @author jiawei Chen
  */
 export function create_template_concat(tableau,list, nbConcat,typeConcat)
@@ -31,13 +31,13 @@ export function create_template_concat(tableau,list, nbConcat,typeConcat)
     if(nbConcat==1)  //En travaillant de l’arrière vers l’avant, nous sommes arrivés à la première place.
     {
         list[nbConcat-1]=typeConcat
-        //list va etre modifié donc on copie la liste et l'ajoute dans la sommet
+        //list va etre modifié donc on copie la liste et l'ajoute dans la liste tableau
         let tamp=[...list]
         tableau.push(tamp)
     }
     else{
-        list[nbConcat-1]=typeConcat
-        //de l'arrière vers l'avant
+        list[nbConcat-1]=typeConcat  //definir la valeur
+        //de l'arrière vers l'avant, avancer le curseur d'une position
         create_template_concat(tableau,list,nbConcat-1,h)
         create_template_concat(tableau,list,nbConcat-1,v)
 
@@ -46,21 +46,23 @@ export function create_template_concat(tableau,list, nbConcat,typeConcat)
 
 /**
  * @description Créer la partie view du modèle
- * @param tableau {array}
- * @param list {array}
- * @param cursor {number}
- * @param nbView {number}
+ * @param tableau {array}  stocker toutes les possibilités
+ * @param list {array}  les objets graphiques on peut utiliser
+ * @param cursor {number}  la position actuelle
+ * @param nbView {number} nombre de views
  * @author jiawei Chen
  */
 export function create_template_view(tableau,list,cursor,nbView)
 {
-    if(cursor==nbView)
+    if(cursor==nbView)  //Une possibilité a été complétée
     {
         let tamp=[...list]
-        tableau.push(tamp)
+        tableau.push(tamp)  //stocker la possibilité
     }
     else
     {
+        //Le contenu avant le curseur reste inchangé.
+        // A partir du curseur, il est échangé avec le contenu suivant.
         for(let j=cursor;j<nbView;j++)
         {
             swapElements_v1(list,j,cursor)
@@ -72,10 +74,10 @@ export function create_template_view(tableau,list,cursor,nbView)
 
 /**
  * @description créer un objet Vega-lite
- * @param concatList {array}
- * @param template {array}
- * @param vlSpec {object}
- * @param cursor {number}
+ * @param concatList {array} liste inséré dans le objet
+ * @param template {array}  model utilisé
+ * @param vlSpec {object}  objet vega-lite
+ * @param cursor {number}  la position actuelle
  * @author jiawei Chen
  */
 export  function create_vega_tree(concatList,template,vlSpec,cursor)
@@ -88,7 +90,7 @@ export  function create_vega_tree(concatList,template,vlSpec,cursor)
         {
             if(cursor==0)
             {
-                //insert attribut "vconcat"
+                //insérer attribut "vconcat"
                 vlSpec.vconcat=concatList
                 //créer ses sous-arbres
                 create_vega_tree(concatList,template,vlSpec,2*cursor+1)
@@ -124,9 +126,9 @@ export  function create_vega_tree(concatList,template,vlSpec,cursor)
             }
 
         }
-        else  //pour les feuilles
+        else  //pour les visualisations
         {
-            //push view objet directement
+            //insérer le objet directement
             concatList.push(template[cursor])
             //continue
             create_vega_tree(concatList,template,vlSpec,2*cursor+1)
@@ -152,53 +154,49 @@ export function which_is_max(num1,num2)
 
 /**
  * @description  Calculer la largeur d'une visualisation
- * @param {Object} view
+ * @param {Object} view un objet graphique
  * @returns {number}
  * @author jiawei Chen
  */
 export function calcul_X(view)
 {
-    //calculer largeur du graphique:si il a cet attribut, return la valeur; sinon return 200
-    if(view)
+    //calculer largeur du graphique:si il a cet attribut, return la valeur
+    if(view.hasOwnProperty("width"))
     {
-        if(view.hasOwnProperty("width"))
-        {
-            //!!!!!!now we just talk about the case that width is a number!!!!!!
-            return view.width
-        }
-        else //objet don't set this attribut, need to do other check
-        {return 200}
+        //!!!!!!now we just talk about the case that width is a number!!!!!!
+        return view.width
     }
+    else //sinon return 200
+    {return 200}
 
 }
 
 /**
  * @description Calculer la hauteur d'une visualisation
- * @param {Object} view
+ * @param {Object} view un objet graphique
  * @returns {number}
  * @author jiawei Chen
  */
 export function calcul_Y(view)
 {
-    //calculer la hauteur du graphique:si il a cet attribut, return la valeur; sinon return 200
-    if(view){
-        if(view.hasOwnProperty("height"))
-        {
-            //!!!!!!now we just talk about the case that width is a number!!!!!!
-            return view.height
-        }
-        else //objet don't set this attribut, need to do other check
-        {return 200}
+    //calculer la hauteur du graphique
+    if(view.hasOwnProperty("height"))
+    {
+        //si il a cet attribut, return la valeur
+        //!!!!!!now we just talk about the case that width is a number!!!!!!
+        return view.height
     }
+    else // sinon return 200
+    {return 200}
 
 }
 
 
 /**
  * @description Calculer la largeur totale d'un modèle
- * @param template {array}
- * @param index {number}
- * @param nbConcat {number}
+ * @param template {array}   modèle utilisé
+ * @param index {number}  curseur
+ * @param nbConcat {number}   nombre de concaténation
  * @returns {number}
  * @author jiawei Chen
  */
@@ -206,38 +204,41 @@ export function tailleX(template, index,nbConcat)
 {
     if(index < nbConcat)
     {
-        //Td et Tg sont views: si le père est "hconcat", on fait width1+width2
+        //cas 1: Td et Tg sont views
         if( template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat")
         {
-            if(template[index]=="hconcat")
+            if(template[index]=="hconcat") //si le père est "hconcat", on fait width1+width2
                 return ( calcul_X(template[2*index+1])+calcul_X(template[2*index+2]) )
             else
-                return which_is_max( calcul_X(template[2*index+1]),calcul_X(template[2*index+2]) )  //si le père est "vconcat", on fait max(width1,width2)
+                //si le père est "vconcat", on fait max(width1,width2)
+                return which_is_max( calcul_X(template[2*index+1]),calcul_X(template[2*index+2]) )
         }
-        //Td est view, Td est concat
+        //cas 2: Td est view, Tg est concat
         else if(template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat" && (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat"))
         {
-            if(template[index]=="hconcat")
+            if(template[index]=="hconcat") //si le père est "hconcat", on fait width1+width2
             {
                 //pour gauche, nous appelons la fonction récursive pour obtenir un résultat du sous-arbre
                 return ( tailleX(template,2*index+1,nbConcat)+calcul_X(template[2*index+2]) )
             }
             else
             {
+                //si le père est "vconcat", on fait max(width1,width2)
                 //pour gauche, nous appelons la fonction récursive pour obtenir un résultat du sous-arbre
                 return which_is_max(tailleX(template,2*index+1,nbConcat),calcul_X(template[2*index+2]) )
             }
         }
-        //Td et Tg sont concat, on explore ses sous-arbres gauche et droit
+        //cas 3: Td et Tg sont concat, on explore ses sous-arbres gauche et droit
         else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]=="hconcat" || template[2*index+2]=="vconcat") )
         {
             if(template[index]=="hconcat")
             {
-
+                //si le père est "hconcat", on fait width1+width2
                 return ( tailleX(template,2*index+1,nbConcat)+tailleX(template,2*index+2,nbConcat) )
             }
             else
             {
+                //si le père est "vconcat", on fait max(width1,width2)
                 return which_is_max(tailleX(template,2*index+1,nbConcat),tailleX(template,2*index+2,nbConcat) )
             }
         }
@@ -256,24 +257,27 @@ export function tailleY(template,index,nbConcat)
 {
     if(index < nbConcat)
     {
-        //Td et Tg sont views: si le père est "hconcat", on fait width1+width2
+        //cas 1: Td et Tg sont views
         if( template[2*index+1]!="hconcat" && template[2*index+1]!="vconcat" && template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat")
         {
             if(template[index]=="hconcat")
+                //si le père est "hconcat", on fait max(height1,height2)
                 return  which_is_max( calcul_Y(template[2*index+1]), calcul_Y(template[2*index+2]) )
-            else
-                return  calcul_Y(template[2*index+1]) + calcul_Y(template[2*index+2]) //si le père est "vconcat", on fait max(width1,width2)
+            else  //si le père est "vconcat", on fait height1+height2
+                return  calcul_Y(template[2*index+1]) + calcul_Y(template[2*index+2])
         }
-        //Td est view
+        //cas 2: Td est view, Tg est concat
         else if(template[2*index+2]!="hconcat" && template[2*index+2]!="vconcat" && (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat"))
         {
             if(template[index]=="hconcat")
             {
                 //pour gauche, nous appelons la fonction récursive pour obtenir un résultat du sous-arbre
+                //si le père est "hconcat", on fait max(height1,height2)
                 return which_is_max( tailleY(template,2*index+1,nbConcat), calcul_Y(template[2*index+2]) )
             }
             else
             {
+                //si le père est "vconcat", on fait height1+height2
                 return (tailleY(template,2*index+1,nbConcat) + calcul_Y(template[2*index+2]) )
             }
         }
@@ -281,11 +285,11 @@ export function tailleY(template,index,nbConcat)
         else if( (template[2*index+1]=="hconcat" || template[2*index+1]=="vconcat") && (template[2*index+2]=="hconcat" || template[2*index+2]=="vconcat") )
         {
             if(template[index]=="hconcat")
-            {
+            { //si le père est "hconcat", on fait max(height1,height2)
                 return which_is_max( tailleY(template,2*index+1,nbConcat), tailleY(template,2*index+2,nbConcat) )
             }
             else
-            {
+            {//si le père est "vconcat", on fait height1+height2
                 return (tailleY(template,2*index+1,nbConcat) + tailleY(template,2*index+2,nbConcat) )
             }
         }
@@ -368,17 +372,17 @@ export function variation(template,nbConcat,nbView,nbIteration)
 
 /**
  * @description Obtenez un graphique avec une surface totale plus petite en ajustant l'ordre à l'intérieur du modèle.
- * @param {Array} template
+ * @param {Array} template modèle va être ajusté
  * @param {number} nbConcat
  * @param {number} nbView
- * @param {number} nbIteration
+ * @param {number} nbIteration nombre d'itration pour ajuster l'ordre
  * @returns {Array}
  * @author jiawei Chen
  */
 export function compare_template_taille(template, nbConcat, nbView,nbIteration)
 {
 
-    //copier le modèlé initial
+    //copier le modèlé initial(deep copy)
     let init_template=structuredClone(template)
     //si le nombre de concat est 1, il est impossible de comparer, donc rendre init_template
     if(nbConcat==1)
@@ -387,12 +391,12 @@ export function compare_template_taille(template, nbConcat, nbView,nbIteration)
     let size_init=calcul_template_taille(init_template,0,nbConcat)
     while (nbIteration>0)
     {
-        //utiliser fonction variation() pour modifier init_template
+        //utiliser fonction variation() pour modifier le modele
         let template2=variation(init_template,nbConcat,nbView,nbIteration)
         //calculer le surface apres modification
         let size_opti=calcul_template_taille(template2,0,nbConcat)
         if( size_opti< size_init)
-        {   //mise a jour le modèle
+        {   //mise a jour le modèle if le resultat actuel est meilleur
             init_template=structuredClone(template2)
         }
         nbIteration--
