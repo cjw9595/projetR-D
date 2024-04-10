@@ -1,6 +1,41 @@
 import {h, v, visualisation,} from "./variables.js"
 
 /**
+ * @description fonction return toutes les possibilités du module
+ * @param templateTotal: {array} toutes les possibilités de module
+ * @param nbConcat:{number} nombre de concaténation
+ * @param nbView {number}  nombre de views
+ * @author jiawei Chen
+ */
+export function create_template_total(templateTotal,nbConcat,nbView)
+{
+    let listTemplate1=[]
+    let listTemplate2=[]
+    //concat list
+    let tableauC=[]
+    //create part concat
+    create_template_concat(tableauC, listTemplate1, nbConcat, h)
+    create_template_concat(tableauC, listTemplate2, nbConcat, v)
+    //view list
+    let tableauV=[]
+    //choisir des views utilisé
+    let listV = []
+    for (let j = 0; j < nbView; j++) {
+        while (1) {
+            let choix = Math.floor(Math.random() * 10)
+            if (!listV.includes(choix)) {
+                listV.push(choix)
+                break;
+            }
+        }
+    }
+    //create template(view part)
+    create_template_view(tableauV,listV,0,nbView)
+    //mix deux partie: get all results possibles with the same number of view and number of concat
+    melange_concat_view(templateTotal, tableauC, tableauV)
+}
+
+/**
  * @description fonction pour obtenir toutes les possibilités du module en combinant la partie concaténation et la partie visualisation
  * @param templateTotal: {array} toutes les possibilités de module
  * @param tableauC:{array} toutes les possibilités de séquence de concaténation
@@ -65,7 +100,7 @@ export function create_template_view(tableau,list,cursor,nbView)
         // A partir du curseur, il est échangé avec le contenu suivant.
         for(let j=cursor;j<nbView;j++)
         {
-            swapElements_v1(list,j,cursor)
+            swapElements_v1(list,j,cursor)/*fdsfqsd*/
             create_template_view(tableau,list,cursor+1,nbView)
             swapElements_v1(list,j,cursor)
         }
@@ -160,15 +195,16 @@ export function which_is_max(num1,num2)
  */
 export function calcul_X(view)
 {
-    //calculer largeur du graphique:si il a cet attribut, return la valeur
-    if(view.hasOwnProperty("width"))
-    {
-        //!!!!!!now we just talk about the case that width is a number!!!!!!
-        return view.width
+    if(view){
+        //calculer largeur du graphique:si il a cet attribut, return la valeur
+        if(view.hasOwnProperty("width"))
+        {
+            //!!!!!!now we just talk about the case that width is a number!!!!!!
+            return view.width
+        }
+        else //sinon return 200
+        {return 200}
     }
-    else //sinon return 200
-    {return 200}
-
 }
 
 /**
@@ -179,16 +215,18 @@ export function calcul_X(view)
  */
 export function calcul_Y(view)
 {
-    //calculer la hauteur du graphique
-    if(view.hasOwnProperty("height"))
+    if(view)  //verifier le objet est défini
     {
-        //si il a cet attribut, return la valeur
-        //!!!!!!now we just talk about the case that width is a number!!!!!!
-        return view.height
+        //calculer la hauteur du graphique
+        if(view.hasOwnProperty("height"))
+        {
+            //si il a cet attribut, return la valeur
+            //!!!!!!now we just talk about the case that width is a number!!!!!!
+            return view.height
+        }
+        else // sinon return 200
+        {return 200}
     }
-    else // sinon return 200
-    {return 200}
-
 }
 
 
@@ -271,9 +309,11 @@ export function tailleY(template,index,nbConcat)
         {
             if(template[index]=="hconcat")
             {
-                //pour gauche, nous appelons la fonction récursive pour obtenir un résultat du sous-arbre
+                //pour gauche, nous appelons la fonction récursive pour obtenir 
+                //un résultat du sous-arbre
                 //si le père est "hconcat", on fait max(height1,height2)
-                return which_is_max( tailleY(template,2*index+1,nbConcat), calcul_Y(template[2*index+2]) )
+                return which_is_max( tailleY(template,2*index+1,nbConcat), 
+                calcul_Y(template[2*index+2]) )
             }
             else
             {
@@ -312,13 +352,14 @@ export function calcul_template_taille(template,index,nbConcat)
 }
 
 /**
- * @description Ajustement de l'ordre dans le modèle : la section concat et la section view sont ajustées séparément
+ * @description Ajustement de l'ordre dans le modèle : la section concat et 
+ *              la section view sont ajustées séparément
  * @param template {array}
  * @param nbConcat {number}
  * @param nbView {number}
  * @param nbIteration {number}
  * @returns {array}
- * @author jiawei Chen
+ * @author jiawei Che,
  */
 export function variation(template,nbConcat,nbView,nbIteration)
 {
@@ -371,7 +412,8 @@ export function variation(template,nbConcat,nbView,nbIteration)
 }
 
 /**
- * @description Obtenez un graphique avec une surface totale plus petite en ajustant l'ordre à l'intérieur du modèle.
+ * @description Obtenez un graphique avec une surface totale plus petite en ajustant 
+ *              l'ordre à l'intérieur du modèle.(mountain climbing)
  * @param {Array} template modèle va être ajusté
  * @param {number} nbConcat
  * @param {number} nbView
@@ -417,36 +459,72 @@ export function swapElements_v1(array, index1, index2){
     array[index2] = temp;
 }
 
-export function test(list_iteration,nbTest,value,templateTotal,nbC)
-{
-        //try nbTest times
-        for(let k=0;k<nbTest;k++)
-        {
-            //choose random to get a model
-            let choix=Math.floor(Math.random()*templateTotal.length)
-            let template_test=structuredClone(templateTotal[choix])
-            //Remplacez les numéros dans la partie view par les objets de views correspondants
-            for(let i=nbC;i<template_test.length;i++)
-            {
+/**
+ * @description Fonction pour tester l'effet du nombre d'itération sur la comparaison de la surface des modèles
+ * @param list_iteration {array}
+ * @param nbTest {number}
+ * @param value {array}
+ * @param templateTotal {array}
+ * @param nbC {number}
+ * @author jiawei Chen
+ */
+export function test(list_iteration,nbTest,value,templateTotal,nbC) {
+  /*  let obj = {}
+    let data = []
+    data.push(['nbConcat', 'nbIteration', 'surface'])
 
-                template_test[i]=visualisation[template_test[i]]
-            }
-            //try value in list_iteraion
-            for (const choixKey in list_iteration) {
-                //get result of fonction compare_taille minimal size
-                let template_final=compare_template_taille(template_test,nbC,nbC+1,list_iteration[choixKey])
-                let surface=calcul_template_taille(template_final,0,nbC)
-                //save in a objet data
-                let obj={}
-                //obj.nbConcat=nbC
-                obj.nbitration=list_iteration[choixKey]
-                obj.size=surface
-                obj.nbConcat=nbC
+    //try nbTest times
+    for (let k = 0; k < nbTest; k++) {
+        //choose random to get a model
+        let choix = Math.floor(Math.random() * templateTotal.length)
+        let template_test = structuredClone(templateTotal[choix])
+        //Remplacez les numéros dans la partie view par les objets de views correspondants
+        for (let i = nbC; i < template_test.length; i++) {
 
-                value.push(obj)
-            }
-
+            template_test[i] = visualisation[template_test[i]]
+        }
+        //try value in list_iteraion
+        for (const choixKey in list_iteration) {
+            //get result of fonction compare_taille minimal size
+            let template_final = compare_template_taille(template_test, nbC, nbC + 1, list_iteration[choixKey])
+            let surface = calcul_template_taille(template_final, 0, nbC)
+            //save in a objet data
+          //  data.push([nbC, list_iteration[choixKey], surface])
+            obj.nbConcat = nbC
+            obj.nbItration = list_iteration[choixKey]
+            obj.size = surface
+            value.push(obj)
         }
 
+    }
+   // return obj*/
+    //try nbTest times
+    for(let k=0;k<nbTest;k++)
+    {
+        //choose random to get a model
+        let choix=Math.floor(Math.random()*templateTotal.length)
+        let template_test=structuredClone(templateTotal[choix])
+        //Remplacez les numéros dans la partie view par les objets de views correspondants
+        for(let i=nbC;i<template_test.length;i++)
+        {
 
+            template_test[i]=visualisation[template_test[i]]
+        }
+        //try value in list_iteraion
+        for (const choixKey in list_iteration) {
+            //get result of fonction compare_taille minimal size
+            let template_final=compare_template_taille(template_test,nbC,nbC+1,list_iteration[choixKey])
+            let surface=calcul_template_taille(template_final,0,nbC)
+            //save in a objet data
+            let obj={}
+            //obj.nbConcat=nbC
+            obj.nbitration=list_iteration[choixKey]
+            obj.size=surface
+            obj.nbConcat=nbC
+
+            value.push(obj)
+        }
+
+    }
 }
+

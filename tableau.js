@@ -1,24 +1,22 @@
-import {v, visualisation,h} from "./variables.js";
-import {calcul_template_taille, compare_template_taille, melange_concat_view} from "./functions.js";
-import {create_template_concat} from "./functions.js";
-import {create_template_view} from "./functions.js";
+import { visualisation} from "./variables.js";
+import {
+  calcul_template_taille,
+  compare_template_taille,
+  create_template_total,
+} from "./functions.js";
 import {vlSpec,vlSpec1} from "./variables.js";
 import {create_vega_tree} from "./functions.js";
 
 
 // Tableaux pour la génération de modèles
-//liste de la concatenation
-let tableauC=[]
-let list_template1=[]
-let list_template2=[]
-// liste de la visualisation
-let tableauV=[]
 //liste pour les modèles totals
 let templateTotal=[]
 //liste pour le modèle aleatoire
-let template_aleatoire=[]
+let templateAleatoire=[]
 //liste pour le modèle optimisé
-let template_optimimse=[]
+let templateOptimimse=[]
+
+
 
 
 // Event listeners for form submission and interaction
@@ -32,49 +30,27 @@ visConfig.addEventListener('submit',(event)=>
     let nbIteration=parseInt(document.getElementById("nbIteration").value)
     console.log("nombre d'iteration:%d",nbIteration)
 
-    //use element[] stock number of Concat and number of view
-    let element=[nbView-1,nbView]
-    //create model(concat part)
-    create_template_concat(tableauC,list_template1,element[0],h)
-    create_template_concat(tableauC,list_template2,element[0],v)
-
-    //choose views will be used
-    let listV=[] //stock these views
-    for(let i=0;i<element[1];i++)
-    {
-      while(1)
-      {
-        let choix=Math.floor(Math.random()*10)  //select random number between [0,nbView)
-        if(!listV.includes(choix))
-        {
-          listV.push(choix)   
-          break; 
-        }
-      }
-    }
-   //create template(view part)
-    create_template_view(tableauV,listV,0,element[1])
-
-    //get all results possibles with the same number of view and number of concat (toutes les permutations possibles)
-    melange_concat_view(templateTotal,tableauC,tableauV)
+    //get number of Concat from number of view
+    let nbCocnat=nbView-1;
+    create_template_total(templateTotal,nbCocnat,nbView)
 
     //random number between [0,size of table)
     let choix=Math.floor(Math.random()*templateTotal.length)
-    template_aleatoire=templateTotal[choix]     //choisir aleatoire modèle
-    console.log("random model without objects views:%o",template_aleatoire)
+    templateAleatoire=templateTotal[choix]     //choisir aleatoire modèle
+    console.log("random model without objects views:%o",templateAleatoire)
     //Remplacez les numéros dans la partie view par les objets de views correspondants
-    for(let i=element[0];i<template_aleatoire.length;i++)
+    for(let i=nbCocnat;i<templateAleatoire.length;i++)
     {
-      template_aleatoire[i]=visualisation[template_aleatoire[i]]
+      templateAleatoire[i]=visualisation[templateAleatoire[i]]
     }
-    console.log("template aleatoire:%o",template_aleatoire)
+    console.log("template aleatoire:%o",templateAleatoire)
 
     //calculer la taille du modèle aleatoire, l'afficher dans la page
-    document.getElementById("size_rand").innerHTML=calcul_template_taille(template_aleatoire,0,element[0]).toString()
+    document.getElementById("size_rand").innerHTML=calcul_template_taille(templateAleatoire,0,nbCocnat).toString()
 
     //créer un objet pour vega-lite
     let concatList=[]
-    create_vega_tree(concatList,template_aleatoire,vlSpec,0)
+    create_vega_tree(concatList,templateAleatoire,vlSpec,0)
     console.log("objet vega-lite:%o",vlSpec)
 
     //afficher le objet Vega-lite
@@ -82,15 +58,15 @@ visConfig.addEventListener('submit',(event)=>
 
 
     //obtenir resultat optimisé
-    template_optimimse=compare_template_taille(template_aleatoire,element[0],element[1],nbIteration)
-    console.log('the result optimised is %o',template_optimimse)
+    templateOptimimse=compare_template_taille(templateAleatoire,nbCocnat,nbView,nbIteration)
+    console.log('the result optimised is %o',templateOptimimse)
 
     //calculer la taille du modèle optimisé, set value
-    document.getElementById("size_opti").innerHTML=calcul_template_taille(template_optimimse,0,element[0]).toString()
+    document.getElementById("size_opti").innerHTML=calcul_template_taille(templateOptimimse,0,nbCocnat).toString()
 
     concatList=[]  //vider la liste
     //créer un objet pour vega-lite
-    create_vega_tree(concatList,template_optimimse,vlSpec1,0)
+    create_vega_tree(concatList,templateOptimimse,vlSpec1,0)
     console.log("objet vega-lite optimised:%o",vlSpec1)
 
     //afficher le graphique
